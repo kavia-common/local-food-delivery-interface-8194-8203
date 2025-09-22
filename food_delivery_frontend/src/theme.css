@@ -183,6 +183,116 @@ body {
   gap: 16px;
 }
 
+/* Hero Cover */
+.hero-cover {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 18px;
+  background: var(--color-surface);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.hero-media {
+  position: relative;
+  border-radius: calc(var(--radius) - 2px);
+  overflow: hidden;
+  height: 260px;
+}
+
+.hero-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.02);
+  transition: transform 300ms ease;
+}
+
+.hero-cover:hover .hero-media img {
+  transform: scale(1.05);
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(37,99,235,0.22), rgba(17,24,39,0.06));
+  mix-blend-mode: multiply;
+}
+
+.hero-content {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  padding: 12px 6px;
+}
+
+.hero-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+
+.hero-title {
+  font-size: 26px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.hero-subtitle {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.hero-features {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+  list-style: none;
+  margin: 6px 0 0 0;
+  padding: 0;
+}
+
+.hero-features li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px dashed rgba(37,99,235,0.35);
+  border-radius: 10px;
+  background: #f5f7fb;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* Responsive layout for Hero */
+@media (max-width: 960px) {
+  .hero-cover {
+    grid-template-columns: 1fr;
+  }
+  .hero-media {
+    height: 200px;
+  }
+  .hero-features {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .hero-media {
+    height: 180px;
+  }
+  .hero-title {
+    font-size: 22px;
+  }
+  .hero-features {
+    grid-template-columns: 1fr;
+  }
+}
+
 .section-header {
   display: flex;
   align-items: center;

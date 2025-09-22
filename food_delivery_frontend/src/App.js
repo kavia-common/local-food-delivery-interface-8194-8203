@@ -396,6 +396,33 @@ function App() {
 
       {/* Content */}
       <main className="container app-content">
+        {/* Hero Cover */}
+        <section className="hero-cover rounded shadow-md" aria-label="App features and highlights">
+          <div className="hero-media">
+            <img
+              src="/assets/food.jpg"
+              alt="Fresh and delicious food selection"
+              loading="eager"
+              decoding="async"
+            />
+            <div className="hero-overlay" aria-hidden="true" />
+          </div>
+          <div className="hero-content">
+            <div className="hero-eyebrow">Your favorites, delivered</div>
+            <h1 className="hero-title">Order delicious food in minutes</h1>
+            <p className="hero-subtitle">
+              Explore nearby restaurants and enjoy seamless ordering with smart filters and a clean checkout.
+            </p>
+            <ul className="hero-features" aria-label="Key features">
+              <li>🍽️ Browse Menus</li>
+              <li>🧠 Smart Filters</li>
+              <li>⚡ Quick Add-to-Cart</li>
+              <li>🛒 Easy Checkout</li>
+              <li>🏷️ Live Offers</li>
+            </ul>
+          </div>
+        </section>
+
         {/* Sidebar */}
         <aside className="sidebar rounded shadow-sm">
           <h3>Filter by cuisine</h3>

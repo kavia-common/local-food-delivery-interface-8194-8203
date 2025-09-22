@@ -1,17 +1,61 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import './theme.css';
 
 /**
  * PUBLIC_INTERFACE
  * App: Minimal shell for the Food Delivery UI following the Ocean Professional theme.
- * Provides a simple layout:
- * - Top navigation bar with brand placeholder and a cart icon button
- * - Sidebar with placeholder cuisine filters
- * - Main content grid with placeholder restaurant/menu cards
- * - Footer with basic text
- * No heavy libraries, only React and CSS. All content is placeholder for future extensibility.
+ * Now includes interactive cuisine filters with in-memory sample data and real-time filtering.
  */
 function App() {
+  // Simple in-memory cuisines and restaurants (placeholder for future persistent/local JSON storage)
+  const cuisineOptions = useMemo(
+    () => [
+      { key: 'italian', label: '🍕 Italian' },
+      { key: 'japanese', label: '🍣 Japanese' },
+      { key: 'mexican', label: '🌮 Mexican' },
+      { key: 'healthy', label: '🥗 Healthy' },
+      { key: 'american', label: '🍔 American' },
+      { key: 'special', label: '🧑‍🍳 Chef\'s Special' }
+    ],
+    []
+  );
+
+  const restaurants = useMemo(
+    () => [
+      { id: 'r1', name: 'Blue Ocean Sushi', cuisines: ['japanese'], meta: 'Sushi • 25–35 min • $$', accent: 'primary' },
+      { id: 'r2', name: 'Amber Grill', cuisines: ['american'], meta: 'Burgers • 20–30 min • $', accent: 'secondary' },
+      { id: 'r3', name: 'Harbor Greens', cuisines: ['healthy'], meta: 'Healthy • 30–40 min • $$', accent: 'primary' },
+      { id: 'r4', name: 'Taco Wave', cuisines: ['mexican'], meta: 'Mexican • 15–25 min • $', accent: 'secondary' },
+      { id: 'r5', name: 'Coastal trattoria', cuisines: ['italian'], meta: 'Italian • 20–30 min • $$', accent: 'primary' },
+      { id: 'r6', name: 'Chef’s Table', cuisines: ['special'], meta: 'Chef\'s Special • 30–50 min • $$$', accent: 'secondary' },
+    ],
+    []
+  );
+
+  // Selected cuisines state
+  const [selectedCuisineKeys, setSelectedCuisineKeys] = useState([]);
+
+  // Toggle handler for cuisine checkboxes
+  const handleCuisineToggle = (key) => {
+    setSelectedCuisineKeys((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  };
+
+  // Derived filtered restaurants (if none selected, show all)
+  const filteredRestaurants = useMemo(() => {
+    if (selectedCuisineKeys.length === 0) return restaurants;
+    return restaurants.filter((r) =>
+      r.cuisines.some((c) => selectedCuisineKeys.includes(c))
+    );
+  }, [restaurants, selectedCuisineKeys]);
+
+  // Helper to render a button with theme accent
+  const buttonStyleFor = (accent) =>
+    accent === 'secondary'
+      ? { width: 80, height: 36, color: 'var(--color-surface)', background: 'var(--color-secondary)', borderColor: 'transparent' }
+      : { width: 80, height: 36, color: 'var(--color-surface)', background: 'var(--color-primary)', borderColor: 'transparent' };
+
   return (
     <div className="app-shell">
       {/* Top Navigation */}
@@ -49,13 +93,41 @@ function App() {
         {/* Sidebar */}
         <aside className="sidebar rounded shadow-sm">
           <h3>Filter by cuisine</h3>
-          <div className="filter-group">
-            <span className="filter-chip">🍕 Italian</span>
-            <span className="filter-chip">🍣 Japanese</span>
-            <span className="filter-chip">🌮 Mexican</span>
-            <span className="filter-chip">🥗 Healthy</span>
-            <span className="filter-chip">🍔 American</span>
-            <span className="filter-chip">🧑‍🍳 Chef's Special</span>
+          {/* PUBLIC_INTERFACE */}
+          {/* Cuisine filters: simple checkbox list with clear UI feedback (checked state + chip) */}
+          <div className="filter-group" role="group" aria-label="Cuisine filters">
+            {cuisineOptions.map((c) => {
+              const checked = selectedCuisineKeys.includes(c.key);
+              return (
+                <label
+                  key={c.key}
+                  className="filter-chip"
+                  style={{
+                    borderColor: checked ? 'rgba(37,99,235,0.55)' : undefined,
+                    background: checked ? '#f0f5ff' : undefined,
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => handleCuisineToggle(c.key)}
+                    aria-label={`Filter by ${c.label.replace(/^[^ ]+ /, '')}`}
+                    style={{ marginRight: 8 }}
+                  />
+                  <span>{c.label}</span>
+                </label>
+              );
+            })}
+            {/* PUBLIC_INTERFACE */}
+            <button
+              className="icon-btn"
+              aria-label="Clear cuisine filters"
+              title="Clear filters"
+              onClick={() => setSelectedCuisineKeys([])}
+              style={{ width: '100%', height: 38, borderStyle: 'dashed' }}
+            >
+              Clear
+            </button>
           </div>
         </aside>
 
@@ -64,7 +136,11 @@ function App() {
           <div className="section-header">
             <div>
               <div className="title">Nearby Restaurants</div>
-              <div className="subtitle">Hand-picked options based on your location</div>
+              <div className="subtitle">
+                {selectedCuisineKeys.length === 0
+                  ? 'Showing all'
+                  : `Filtered by ${selectedCuisineKeys.length} cuisine${selectedCuisineKeys.length > 1 ? 's' : ''}`}
+              </div>
             </div>
             <button
               className="icon-btn"
@@ -77,39 +153,28 @@ function App() {
           </div>
 
           <div className="card-grid">
-            {/* Placeholder cards */}
-            <article className="card">
-              <div className="card-title">Blue Ocean Sushi</div>
-              <div className="card-meta">Sushi • 25–35 min • $$</div>
-              <div style={{ height: 8 }}></div>
-              <button className="icon-btn" aria-label="Add to cart" title="Add to cart" style={{ width: 80, height: 36, color: 'var(--color-surface)', background: 'var(--color-primary)', borderColor: 'transparent' }}>
-                Add
-              </button>
-            </article>
-
-            <article className="card">
-              <div className="card-title">Amber Grill</div>
-              <div className="card-meta">Burgers • 20–30 min • $</div>
-              <button className="icon-btn" aria-label="Add to cart" title="Add to cart" style={{ width: 80, height: 36, color: 'var(--color-surface)', background: 'var(--color-secondary)', borderColor: 'transparent' }}>
-                Add
-              </button>
-            </article>
-
-            <article className="card">
-              <div className="card-title">Harbor Greens</div>
-              <div className="card-meta">Healthy • 30–40 min • $$</div>
-              <button className="icon-btn" aria-label="Add to cart" title="Add to cart" style={{ width: 80, height: 36, color: 'var(--color-surface)', background: 'var(--color-primary)', borderColor: 'transparent' }}>
-                Add
-              </button>
-            </article>
-
-            <article className="card">
-              <div className="card-title">Taco Wave</div>
-              <div className="card-meta">Mexican • 15–25 min • $</div>
-              <button className="icon-btn" aria-label="Add to cart" title="Add to cart" style={{ width: 80, height: 36, color: 'var(--color-surface)', background: 'var(--color-secondary)', borderColor: 'transparent' }}>
-                Add
-              </button>
-            </article>
+            {filteredRestaurants.length === 0 ? (
+              <article className="card" role="status">
+                <div className="card-title">No matches</div>
+                <div className="card-meta">Try adjusting your cuisine filters.</div>
+              </article>
+            ) : (
+              filteredRestaurants.map((r) => (
+                <article key={r.id} className="card">
+                  <div className="card-title">{r.name}</div>
+                  <div className="card-meta">{r.meta}</div>
+                  <div style={{ height: 8 }}></div>
+                  <button
+                    className="icon-btn"
+                    aria-label={`Add ${r.name} to cart`}
+                    title="Add to cart"
+                    style={buttonStyleFor(r.accent)}
+                  >
+                    Add
+                  </button>
+                </article>
+              ))
+            )}
           </div>
         </section>
       </main>

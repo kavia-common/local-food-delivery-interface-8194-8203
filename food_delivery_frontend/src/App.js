@@ -5,6 +5,7 @@ import './theme.css';
  * PUBLIC_INTERFACE
  * App: Minimal shell for the Food Delivery UI following the Ocean Professional theme.
  * Now includes interactive cuisine filters plus rating and offers filters with in-memory sample data and real-time filtering.
+ * Enhanced with a minimal in-memory cart: menu cards have "Add" buttons, and the navbar shows a live cart count.
  */
 function App() {
   // Simple in-memory cuisines and restaurants (placeholder for future persistent/local JSON storage)
@@ -39,6 +40,11 @@ function App() {
   const [minRating, setMinRating] = useState(0); // 0..5 in 0.5 increments
   // Offers toggle
   const [onlyOffers, setOnlyOffers] = useState(false);
+
+  // Minimal cart state: array of {id, name, qty}
+  const [cart, setCart] = useState([]);
+  // Brief feedback pulse when adding to cart (used to animate badge)
+  const [cartPulse, setCartPulse] = useState(false);
 
   // Toggle handler for cuisine checkboxes
   const handleCuisineToggle = (key) => {
@@ -97,6 +103,55 @@ function App() {
     );
   }
 
+  // PUBLIC_INTERFACE
+  function CartBadge({ count, pulsing }) {
+    /** Renders a small badge with item count next to the cart icon. */
+    const badgeStyle = {
+      minWidth: 18,
+      height: 18,
+      padding: '0 4px',
+      borderRadius: 999,
+      background: 'var(--color-primary)',
+      color: 'var(--color-surface)',
+      fontSize: 11,
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      border: '1px solid rgba(37,99,235,0.5)',
+      transform: pulsing ? 'scale(1.08)' : 'scale(1)',
+      transition: 'transform 200ms ease'
+    };
+    if (count <= 0) return null;
+    return <span aria-live="polite" style={badgeStyle}>{count}</span>;
+  }
+
+  // PUBLIC_INTERFACE
+  function addToCart(item) {
+    /**
+     * Adds an item to the in-memory cart, increments qty if already present,
+     * and triggers a short visual pulse for feedback.
+     */
+    setCart((prev) => {
+      const idx = prev.findIndex((it) => it.id === item.id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], qty: next[idx].qty + 1 };
+        return next;
+      }
+      return [...prev, { id: item.id, name: item.name, qty: 1 }];
+    });
+
+    // brief pulse effect for cart badge
+    setCartPulse(true);
+    window.setTimeout(() => setCartPulse(false), 220);
+  }
+
+  // PUBLIC_INTERFACE
+  function cartCountTotal() {
+    /** Returns the sum of quantities in the cart. */
+    return cart.reduce((sum, it) => sum + (it.qty || 0), 0);
+  }
+
   return (
     <div className="app-shell">
       {/* Top Navigation */}
@@ -110,12 +165,15 @@ function App() {
             </div>
           </div>
 
-          <div className="nav-actions">
+          <div className="nav-actions" aria-live="polite">
             <button className="icon-btn" aria-label="Search">
               🔍
             </button>
-            <button className="icon-btn" aria-label="Cart">
-              🛒
+            <button className="icon-btn" aria-label="Cart" title="Cart">
+              <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                🛒
+                <CartBadge count={cartCountTotal()} pulsing={cartPulse} />
+              </span>
             </button>
             <button
               className="icon-btn"
@@ -288,6 +346,7 @@ function App() {
                     className="icon-btn"
                     aria-label={`Add ${r.name} to cart`}
                     title="Add to cart"
+                    onClick={() => addToCart(r)}
                     style={buttonStyleFor(r.accent)}
                   >
                     Add

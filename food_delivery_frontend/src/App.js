@@ -10,25 +10,161 @@ import { lsGet, lsSet, ensureSeed } from './storage';
 function App() {
   // Seed defaults for cuisines and restaurants in localStorage and read them back.
   const cuisineOptions = useMemo(() => {
+    // Expanded cuisine list for richer filtering
     return ensureSeed('cuisines', [
       { key: 'italian', label: '🍕 Italian' },
       { key: 'japanese', label: '🍣 Japanese' },
       { key: 'mexican', label: '🌮 Mexican' },
       { key: 'healthy', label: '🥗 Healthy' },
       { key: 'american', label: '🍔 American' },
+      { key: 'indian', label: '🍛 Indian' },
+      { key: 'thai', label: '🍜 Thai' },
+      { key: 'chinese', label: '🥟 Chinese' },
+      { key: 'mediterranean', label: '🧆 Mediterranean' },
+      { key: 'middleeastern', label: '🍢 Middle Eastern' },
+      { key: 'korean', label: '🍲 Korean' },
+      { key: 'vietnamese', label: '🍜 Vietnamese' },
+      { key: 'bbq', label: '🍖 BBQ' },
+      { key: 'seafood', label: '🦞 Seafood' },
+      { key: 'bakery', label: '🥐 Bakery' },
+      { key: 'dessert', label: '🍰 Dessert' },
+      { key: 'breakfast', label: '🍳 Breakfast' },
+      { key: 'vegan', label: '🌱 Vegan' },
       { key: 'special', label: '🧑‍🍳 Chef\'s Special' }
     ]);
   }, []);
 
+  // Seed menu items per restaurant (kept for future menu rendering; does not affect current UI)
+  useMemo(() => {
+    ensureSeed('menus', {
+      r1: [
+        { id: 'r1-m1', name: 'Salmon Nigiri', price: 8.5 },
+        { id: 'r1-m2', name: 'Tuna Roll', price: 7.0 },
+        { id: 'r1-m3', name: 'Dragon Roll', price: 12.0 }
+      ],
+      r2: [
+        { id: 'r2-m1', name: 'Classic Cheeseburger', price: 9.0 },
+        { id: 'r2-m2', name: 'Crispy Fries', price: 3.5 },
+        { id: 'r2-m3', name: 'BBQ Bacon Burger', price: 11.5 }
+      ],
+      r3: [
+        { id: 'r3-m1', name: 'Quinoa Bowl', price: 10.0 },
+        { id: 'r3-m2', name: 'Green Smoothie', price: 5.0 },
+        { id: 'r3-m3', name: 'Avocado Toast', price: 7.5 }
+      ],
+      r4: [
+        { id: 'r4-m1', name: 'Carne Asada Taco', price: 3.0 },
+        { id: 'r4-m2', name: 'Chicken Tinga Taco', price: 2.8 },
+        { id: 'r4-m3', name: 'Chips & Salsa', price: 2.5 }
+      ],
+      r5: [
+        { id: 'r5-m1', name: 'Spaghetti Carbonara', price: 12.0 },
+        { id: 'r5-m2', name: 'Margherita Pizza', price: 11.0 },
+        { id: 'r5-m3', name: 'Bruschetta', price: 6.0 }
+      ],
+      r6: [
+        { id: 'r6-m1', name: 'Chef’s Tasting Menu', price: 65.0 },
+        { id: 'r6-m2', name: 'Seasonal Appetizer', price: 18.0 }
+      ],
+      r7: [
+        { id: 'r7-m1', name: 'Chicken Tikka Masala', price: 13.0 },
+        { id: 'r7-m2', name: 'Vegetable Biryani', price: 11.0 },
+        { id: 'r7-m3', name: 'Garlic Naan', price: 3.0 }
+      ],
+      r8: [
+        { id: 'r8-m1', name: 'Pad Thai', price: 12.0 },
+        { id: 'r8-m2', name: 'Green Curry', price: 12.5 },
+        { id: 'r8-m3', name: 'Tom Yum Soup', price: 7.0 }
+      ],
+      r9: [
+        { id: 'r9-m1', name: 'Kung Pao Chicken', price: 11.0 },
+        { id: 'r9-m2', name: 'Fried Rice', price: 9.0 },
+        { id: 'r9-m3', name: 'Spring Rolls', price: 4.0 }
+      ],
+      r10: [
+        { id: 'r10-m1', name: 'Chicken Shawarma Wrap', price: 9.5 },
+        { id: 'r10-m2', name: 'Falafel Plate', price: 10.0 },
+        { id: 'r10-m3', name: 'Hummus', price: 4.5 }
+      ],
+      r11: [
+        { id: 'r11-m1', name: 'Bibimbap', price: 12.0 },
+        { id: 'r11-m2', name: 'Bulgogi', price: 14.0 },
+        { id: 'r11-m3', name: 'Kimchi', price: 3.5 }
+      ],
+      r12: [
+        { id: 'r12-m1', name: 'Beef Pho', price: 11.0 },
+        { id: 'r12-m2', name: 'Chicken Pho', price: 10.5 },
+        { id: 'r12-m3', name: 'Fresh Spring Rolls', price: 5.0 }
+      ],
+      r13: [
+        { id: 'r13-m1', name: 'Gyro Plate', price: 12.0 },
+        { id: 'r13-m2', name: 'Greek Salad', price: 8.0 },
+        { id: 'r13-m3', name: 'Spanakopita', price: 6.5 }
+      ],
+      r14: [
+        { id: 'r14-m1', name: 'Smoked Ribs', price: 16.0 },
+        { id: 'r14-m2', name: 'Pulled Pork Sandwich', price: 11.0 },
+        { id: 'r14-m3', name: 'Cornbread', price: 3.5 }
+      ],
+      r15: [
+        { id: 'r15-m1', name: 'Avocado Toast', price: 7.0 },
+        { id: 'r15-m2', name: 'Breakfast Burrito', price: 8.5 },
+        { id: 'r15-m3', name: 'Latte', price: 4.0 }
+      ],
+      r16: [
+        { id: 'r16-m1', name: 'Chocolate Cake Slice', price: 5.5 },
+        { id: 'r16-m2', name: 'Cheesecake', price: 6.0 },
+        { id: 'r16-m3', name: 'Macarons (6)', price: 8.0 }
+      ],
+      r17: [
+        { id: 'r17-m1', name: 'Tofu Buddha Bowl', price: 11.5 },
+        { id: 'r17-m2', name: 'Vegan Brownie', price: 3.5 },
+        { id: 'r17-m3', name: 'Kombucha', price: 4.0 }
+      ],
+      r18: [
+        { id: 'r18-m1', name: 'Grilled Salmon', price: 18.0 },
+        { id: 'r18-m2', name: 'Fish & Chips', price: 14.0 },
+        { id: 'r18-m3', name: 'Clam Chowder', price: 7.5 }
+      ],
+      r19: [
+        { id: 'r19-m1', name: 'Pepperoni Pizza (Large)', price: 12.0 },
+        { id: 'r19-m2', name: 'Garlic Knots', price: 4.0 },
+        { id: 'r19-m3', name: 'Caesar Salad', price: 6.0 }
+      ],
+      r20: [
+        { id: 'r20-m1', name: 'Al Pastor Tacos (3)', price: 9.5 },
+        { id: 'r20-m2', name: 'Quesadilla', price: 7.5 },
+        { id: 'r20-m3', name: 'Elote', price: 4.0 }
+      ]
+    });
+  }, []);
+
   // Sample restaurants data (seed once if missing)
   const restaurants = useMemo(() => {
+    // Mix accents and ensure varied ratings and offers
     return ensureSeed('restaurants', [
-      { id: 'r1', name: 'Blue Ocean Sushi', cuisines: ['japanese'], meta: 'Sushi • 25–35 min • $$', accent: 'primary', rating: 4.6, hasOffer: true, offerText: '10% off rolls' },
-      { id: 'r2', name: 'Amber Grill', cuisines: ['american'], meta: 'Burgers • 20–30 min • $', accent: 'secondary', rating: 4.1, hasOffer: false },
-      { id: 'r3', name: 'Harbor Greens', cuisines: ['healthy'], meta: 'Healthy • 30–40 min • $$', accent: 'primary', rating: 4.8, hasOffer: true, offerText: 'Free smoothie' },
+      { id: 'r1', name: 'Blue Ocean Sushi', cuisines: ['japanese', 'seafood'], meta: 'Sushi • 25–35 min • $$', accent: 'primary', rating: 4.6, hasOffer: true, offerText: '10% off rolls' },
+      { id: 'r2', name: 'Amber Grill', cuisines: ['american', 'bbq'], meta: 'Burgers • 20–30 min • $', accent: 'secondary', rating: 4.1, hasOffer: false },
+      { id: 'r3', name: 'Harbor Greens', cuisines: ['healthy', 'vegan'], meta: 'Healthy • 30–40 min • $$', accent: 'primary', rating: 4.8, hasOffer: true, offerText: 'Free smoothie' },
       { id: 'r4', name: 'Taco Wave', cuisines: ['mexican'], meta: 'Mexican • 15–25 min • $', accent: 'secondary', rating: 3.9, hasOffer: false },
-      { id: 'r5', name: 'Coastal Trattoria', cuisines: ['italian'], meta: 'Italian • 20–30 min • $$', accent: 'primary', rating: 4.3, hasOffer: true, offerText: '2-for-1 pastas' },
+      { id: 'r5', name: 'Coastal Trattoria', cuisines: ['italian', 'mediterranean'], meta: 'Italian • 20–30 min • $$', accent: 'primary', rating: 4.3, hasOffer: true, offerText: '2-for-1 pastas' },
       { id: 'r6', name: 'Chef’s Table', cuisines: ['special'], meta: 'Chef\'s Special • 30–50 min • $$$', accent: 'secondary', rating: 4.9, hasOffer: false },
+
+      { id: 'r7', name: 'Curry Harbor', cuisines: ['indian'], meta: 'Indian • 30–40 min • $$', accent: 'primary', rating: 4.5, hasOffer: true, offerText: '15% off biryani' },
+      { id: 'r8', name: 'Bangkok Breeze', cuisines: ['thai'], meta: 'Thai • 20–30 min • $$', accent: 'secondary', rating: 4.2, hasOffer: false },
+      { id: 'r9', name: 'Dragon Wok', cuisines: ['chinese'], meta: 'Chinese • 25–35 min • $', accent: 'primary', rating: 3.8, hasOffer: true, offerText: 'Free spring roll' },
+      { id: 'r10', name: 'Shawarma Shore', cuisines: ['middleeastern'], meta: 'Wraps • 15–25 min • $', accent: 'secondary', rating: 4.0, hasOffer: false },
+      { id: 'r11', name: 'Seoul Kitchen', cuisines: ['korean'], meta: 'Korean • 25–35 min • $$', accent: 'primary', rating: 4.4, hasOffer: true, offerText: 'Buy 2 get 1 kimchi' },
+      { id: 'r12', name: 'Pho Bay', cuisines: ['vietnamese'], meta: 'Pho • 20–30 min • $', accent: 'secondary', rating: 4.7, hasOffer: false },
+
+      { id: 'r13', name: 'Mediterraneo', cuisines: ['mediterranean'], meta: 'Mediterranean • 30–45 min • $$', accent: 'primary', rating: 4.3, hasOffer: false },
+      { id: 'r14', name: 'Smokehouse Dock', cuisines: ['bbq', 'american'], meta: 'BBQ • 35–45 min • $$', accent: 'secondary', rating: 4.0, hasOffer: true, offerText: 'Ribs combo deal' },
+      { id: 'r15', name: 'Morning Tide', cuisines: ['breakfast', 'bakery'], meta: 'Breakfast • 15–25 min • $', accent: 'primary', rating: 4.1, hasOffer: true, offerText: 'Coffee + croissant $5' },
+      { id: 'r16', name: 'Sweet Sail', cuisines: ['dessert', 'bakery'], meta: 'Desserts • 20–30 min • $', accent: 'secondary', rating: 4.6, hasOffer: false },
+      { id: 'r17', name: 'Greenport Vegan', cuisines: ['vegan', 'healthy'], meta: 'Vegan • 25–35 min • $$', accent: 'primary', rating: 4.9, hasOffer: true, offerText: 'Free dessert bar' },
+      { id: 'r18', name: 'Harbor Seafood Grill', cuisines: ['seafood', 'american'], meta: 'Seafood • 35–45 min • $$$', accent: 'secondary', rating: 4.2, hasOffer: false },
+      { id: 'r19', name: 'Napoli by the Bay', cuisines: ['italian'], meta: 'Pizza • 25–35 min • $', accent: 'primary', rating: 3.6, hasOffer: true, offerText: 'Large pizza $12' },
+      { id: 'r20', name: 'Tortilla Coast', cuisines: ['mexican'], meta: 'Mexican • 20–30 min • $', accent: 'secondary', rating: 4.8, hasOffer: true, offerText: 'Taco Tuesday 20% off' }
     ]);
   }, []);
 

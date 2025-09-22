@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import './theme.css';
+import { lsGet, lsSet, ensureSeed } from './storage';
 
 /**
  * PUBLIC_INTERFACE
@@ -7,41 +8,39 @@ import './theme.css';
  * Includes interactive filters and a complete in-memory cart with a minimal checkout flow.
  */
 function App() {
-  // Simple in-memory cuisines and restaurants (placeholder for future persistent/local JSON storage)
-  const cuisineOptions = useMemo(
-    () => [
+  // Seed defaults for cuisines and restaurants in localStorage and read them back.
+  const cuisineOptions = useMemo(() => {
+    return ensureSeed('cuisines', [
       { key: 'italian', label: '🍕 Italian' },
       { key: 'japanese', label: '🍣 Japanese' },
       { key: 'mexican', label: '🌮 Mexican' },
       { key: 'healthy', label: '🥗 Healthy' },
       { key: 'american', label: '🍔 American' },
       { key: 'special', label: '🧑‍🍳 Chef\'s Special' }
-    ],
-    []
-  );
+    ]);
+  }, []);
 
-  // Sample data extended with rating and offers to enable new filters
-  const restaurants = useMemo(
-    () => [
+  // Sample restaurants data (seed once if missing)
+  const restaurants = useMemo(() => {
+    return ensureSeed('restaurants', [
       { id: 'r1', name: 'Blue Ocean Sushi', cuisines: ['japanese'], meta: 'Sushi • 25–35 min • $$', accent: 'primary', rating: 4.6, hasOffer: true, offerText: '10% off rolls' },
       { id: 'r2', name: 'Amber Grill', cuisines: ['american'], meta: 'Burgers • 20–30 min • $', accent: 'secondary', rating: 4.1, hasOffer: false },
       { id: 'r3', name: 'Harbor Greens', cuisines: ['healthy'], meta: 'Healthy • 30–40 min • $$', accent: 'primary', rating: 4.8, hasOffer: true, offerText: 'Free smoothie' },
       { id: 'r4', name: 'Taco Wave', cuisines: ['mexican'], meta: 'Mexican • 15–25 min • $', accent: 'secondary', rating: 3.9, hasOffer: false },
       { id: 'r5', name: 'Coastal Trattoria', cuisines: ['italian'], meta: 'Italian • 20–30 min • $$', accent: 'primary', rating: 4.3, hasOffer: true, offerText: '2-for-1 pastas' },
       { id: 'r6', name: 'Chef’s Table', cuisines: ['special'], meta: 'Chef\'s Special • 30–50 min • $$$', accent: 'secondary', rating: 4.9, hasOffer: false },
-    ],
-    []
-  );
+    ]);
+  }, []);
 
-  // Selected cuisines state
-  const [selectedCuisineKeys, setSelectedCuisineKeys] = useState([]);
-  // Rating filter (minimum)
-  const [minRating, setMinRating] = useState(0); // 0..5 in 0.5 increments
-  // Offers toggle
-  const [onlyOffers, setOnlyOffers] = useState(false);
+  // Selected cuisines state (persisted)
+  const [selectedCuisineKeys, setSelectedCuisineKeys] = useState(() => lsGet('filters:selectedCuisines', []));
+  // Rating filter (minimum) (persisted)
+  const [minRating, setMinRating] = useState(() => lsGet('filters:minRating', 0)); // 0..5 in 0.5 increments
+  // Offers toggle (persisted)
+  const [onlyOffers, setOnlyOffers] = useState(() => lsGet('filters:onlyOffers', false));
 
-  // Minimal cart state: array of {id, name, qty}
-  const [cart, setCart] = useState([]);
+  // Minimal cart state: array of {id, name, qty} (persisted)
+  const [cart, setCart] = useState(() => lsGet('cart', []));
   // Brief feedback pulse when adding to cart (used to animate badge)
   const [cartPulse, setCartPulse] = useState(false);
   // Drawer state
@@ -49,6 +48,24 @@ function App() {
   // Checkout mock state
   const [checkoutStage, setCheckoutStage] = useState('cart'); // 'cart' | 'details' | 'review' | 'success'
   const [checkoutDetails, setCheckoutDetails] = useState({ name: '', address: '', notes: '' });
+
+  // Persist filters to localStorage on change
+  useEffect(() => {
+    lsSet('filters:selectedCuisines', selectedCuisineKeys);
+  }, [selectedCuisineKeys]);
+
+  useEffect(() => {
+    lsSet('filters:minRating', minRating);
+  }, [minRating]);
+
+  useEffect(() => {
+    lsSet('filters:onlyOffers', onlyOffers);
+  }, [onlyOffers]);
+
+  // Persist cart to localStorage on change
+  useEffect(() => {
+    lsSet('cart', cart);
+  }, [cart]);
 
   // Toggle handler for cuisine checkboxes
   const handleCuisineToggle = (key) => {

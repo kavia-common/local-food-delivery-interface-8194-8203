@@ -81,7 +81,7 @@ function App() {
             <article className="card">
               <div className="card-title">Blue Ocean Sushi</div>
               <div className="card-meta">Sushi • 25–35 min • $$</div>
-              <div style="height:8px;"></div>
+              <div style={{ height: 8 }}></div>
               <button className="icon-btn" aria-label="Add to cart" title="Add to cart" style={{ width: 80, height: 36, color: 'var(--color-surface)', background: 'var(--color-primary)', borderColor: 'transparent' }}>
                 Add
               </button>

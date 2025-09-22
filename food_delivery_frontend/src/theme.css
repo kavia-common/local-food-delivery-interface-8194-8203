@@ -152,6 +152,12 @@ body {
   margin-top: 8px;
 }
 
+/* Compact chip variant for badges */
+.filter-chip.badge {
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
 .filter-chip {
   display: inline-flex;
   align-items: center;

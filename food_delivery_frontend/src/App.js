@@ -4,8 +4,7 @@ import './theme.css';
 /**
  * PUBLIC_INTERFACE
  * App: Minimal shell for the Food Delivery UI following the Ocean Professional theme.
- * Now includes interactive cuisine filters plus rating and offers filters with in-memory sample data and real-time filtering.
- * Enhanced with a minimal in-memory cart: menu cards have "Add" buttons, and the navbar shows a live cart count.
+ * Includes interactive filters and a complete in-memory cart with a minimal checkout flow.
  */
 function App() {
   // Simple in-memory cuisines and restaurants (placeholder for future persistent/local JSON storage)
@@ -45,6 +44,11 @@ function App() {
   const [cart, setCart] = useState([]);
   // Brief feedback pulse when adding to cart (used to animate badge)
   const [cartPulse, setCartPulse] = useState(false);
+  // Drawer state
+  const [cartOpen, setCartOpen] = useState(false);
+  // Checkout mock state
+  const [checkoutStage, setCheckoutStage] = useState('cart'); // 'cart' | 'details' | 'review' | 'success'
+  const [checkoutDetails, setCheckoutDetails] = useState({ name: '', address: '', notes: '' });
 
   // Toggle handler for cuisine checkboxes
   const handleCuisineToggle = (key) => {
@@ -152,6 +156,51 @@ function App() {
     return cart.reduce((sum, it) => sum + (it.qty || 0), 0);
   }
 
+  // PUBLIC_INTERFACE
+  function updateQty(id, qty) {
+    /** Update quantity for a cart item. Remove if qty <= 0. */
+    setCart((prev) => {
+      if (qty <= 0) return prev.filter((it) => it.id !== id);
+      return prev.map((it) => (it.id === id ? { ...it, qty } : it));
+    });
+  }
+
+  // PUBLIC_INTERFACE
+  function removeFromCart(id) {
+    /** Remove an item from the cart by id. */
+    setCart((prev) => prev.filter((it) => it.id !== id));
+  }
+
+  // PUBLIC_INTERFACE
+  function clearCart() {
+    /** Clear the entire cart. */
+    setCart([]);
+  }
+
+  // PUBLIC_INTERFACE
+  function openCart() {
+    /** Open cart drawer and reset to cart stage. */
+    setCheckoutStage('cart');
+    setCartOpen(true);
+  }
+
+  // PUBLIC_INTERFACE
+  function startCheckout() {
+    /** Proceed to checkout details if cart has items. */
+    if (cartCountTotal() === 0) return;
+    setCheckoutStage('details');
+  }
+
+  // PUBLIC_INTERFACE
+  function placeOrderMock() {
+    /** Mock placing an order: show success, then clear cart. */
+    setCheckoutStage('success');
+    // Clear cart after a moment
+    setTimeout(() => {
+      clearCart();
+    }, 300);
+  }
+
   return (
     <div className="app-shell">
       {/* Top Navigation */}
@@ -169,7 +218,12 @@ function App() {
             <button className="icon-btn" aria-label="Search">
               🔍
             </button>
-            <button className="icon-btn" aria-label="Cart" title="Cart">
+            <button
+              className="icon-btn"
+              aria-label="Cart"
+              title="Cart"
+              onClick={openCart}
+            >
               <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                 🛒
                 <CartBadge count={cartCountTotal()} pulsing={cartPulse} />
@@ -357,6 +411,247 @@ function App() {
           </div>
         </section>
       </main>
+
+      {/* Cart Drawer */}
+      {cartOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Cart and checkout"
+          className="cart-overlay"
+          onClick={() => setCartOpen(false)}
+        >
+          <div
+            className="cart-drawer rounded shadow-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="cart-header">
+              <div className="title" style={{ fontSize: 18 }}>
+                {checkoutStage === 'cart' && 'Your Cart'}
+                {checkoutStage === 'details' && 'Checkout Details'}
+                {checkoutStage === 'review' && 'Review Order'}
+                {checkoutStage === 'success' && 'Order Placed'}
+              </div>
+              <button
+                className="icon-btn"
+                aria-label="Close cart"
+                title="Close"
+                onClick={() => setCartOpen(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="cart-content">
+              {checkoutStage === 'cart' && (
+                <>
+                  {cart.length === 0 ? (
+                    <div className="card-meta">Your cart is empty.</div>
+                  ) : (
+                    <ul className="cart-items">
+                      {cart.map((it) => (
+                        <li key={it.id} className="cart-item">
+                          <div className="cart-item-info">
+                            <div className="cart-item-name">{it.name}</div>
+                          </div>
+                          <div className="cart-item-actions">
+                            <button
+                              className="icon-btn"
+                              aria-label={`Decrease ${it.name}`}
+                              title="Decrease"
+                              onClick={() => updateQty(it.id, (it.qty || 0) - 1)}
+                            >−</button>
+                            <input
+                              className="qty-input"
+                              aria-label={`${it.name} quantity`}
+                              type="number"
+                              min="0"
+                              value={it.qty}
+                              onChange={(e) => updateQty(it.id, Math.max(0, parseInt(e.target.value || '0', 10)))}
+                            />
+                            <button
+                              className="icon-btn"
+                              aria-label={`Increase ${it.name}`}
+                              title="Increase"
+                              onClick={() => updateQty(it.id, (it.qty || 0) + 1)}
+                            >+</button>
+                            <button
+                              className="icon-btn"
+                              aria-label={`Remove ${it.name}`}
+                              title="Remove"
+                              onClick={() => removeFromCart(it.id)}
+                              style={{ width: 'auto', padding: '0 10px', color: 'var(--color-error)', borderColor: 'rgba(239,68,68,0.35)' }}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  <div className="cart-footer">
+                    <div className="cart-summary">
+                      <span className="card-meta">Items</span>
+                      <strong>{cartCountTotal()}</strong>
+                    </div>
+                    <div className="cart-actions">
+                      <button
+                        className="icon-btn"
+                        aria-label="Clear cart"
+                        title="Clear cart"
+                        onClick={clearCart}
+                        style={{ width: 'auto', padding: '0 12px', borderStyle: 'dashed' }}
+                        disabled={cart.length === 0}
+                      >
+                        Clear
+                      </button>
+                      <button
+                        className="icon-btn"
+                        aria-label="Checkout"
+                        title="Checkout"
+                        onClick={startCheckout}
+                        style={{ width: 'auto', padding: '0 14px', background: 'var(--color-primary)', color: 'var(--color-surface)', borderColor: 'transparent' }}
+                        disabled={cart.length === 0}
+                      >
+                        Checkout →
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {checkoutStage === 'details' && (
+                <form
+                  className="checkout-form"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setCheckoutStage('review');
+                  }}
+                >
+                  <label className="form-field">
+                    <span>Name</span>
+                    <input
+                      type="text"
+                      required
+                      value={checkoutDetails.name}
+                      onChange={(e) => setCheckoutDetails({ ...checkoutDetails, name: e.target.value })}
+                      placeholder="Your full name"
+                    />
+                  </label>
+                  <label className="form-field">
+                    <span>Address</span>
+                    <textarea
+                      required
+                      rows="3"
+                      value={checkoutDetails.address}
+                      onChange={(e) => setCheckoutDetails({ ...checkoutDetails, address: e.target.value })}
+                      placeholder="Delivery address"
+                    />
+                  </label>
+                  <label className="form-field">
+                    <span>Notes (optional)</span>
+                    <input
+                      type="text"
+                      value={checkoutDetails.notes}
+                      onChange={(e) => setCheckoutDetails({ ...checkoutDetails, notes: e.target.value })}
+                      placeholder="Any delivery instructions?"
+                    />
+                  </label>
+                  <div className="cart-actions" style={{ marginTop: 8 }}>
+                    <button
+                      type="button"
+                      className="icon-btn"
+                      onClick={() => setCheckoutStage('cart')}
+                      aria-label="Back to cart"
+                      title="Back"
+                      style={{ width: 'auto', padding: '0 12px' }}
+                    >
+                      ← Back
+                    </button>
+                    <button
+                      type="submit"
+                      className="icon-btn"
+                      aria-label="Review order"
+                      title="Review"
+                      style={{ width: 'auto', padding: '0 14px', background: 'var(--color-primary)', color: 'var(--color-surface)', borderColor: 'transparent' }}
+                    >
+                      Review →
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {checkoutStage === 'review' && (
+                <div className="review">
+                  <div className="card-meta" style={{ marginBottom: 8 }}>
+                    Please confirm your order and details.
+                  </div>
+                  <div className="review-block">
+                    <div className="review-title">Items</div>
+                    <ul className="cart-items">
+                      {cart.map((it) => (
+                        <li key={it.id} className="cart-item">
+                          <div className="cart-item-info">
+                            <div className="cart-item-name">{it.name}</div>
+                          </div>
+                          <div className="cart-item-actions">
+                            <span className="qty-badge">{it.qty}x</span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="review-block">
+                    <div className="review-title">Delivery</div>
+                    <div className="card-meta">Name: <strong>{checkoutDetails.name}</strong></div>
+                    <div className="card-meta">Address: <strong>{checkoutDetails.address}</strong></div>
+                    {checkoutDetails.notes && (
+                      <div className="card-meta">Notes: <strong>{checkoutDetails.notes}</strong></div>
+                    )}
+                  </div>
+
+                  <div className="cart-actions" style={{ marginTop: 8 }}>
+                    <button
+                      className="icon-btn"
+                      onClick={() => setCheckoutStage('details')}
+                      aria-label="Back to details"
+                      title="Back"
+                      style={{ width: 'auto', padding: '0 12px' }}
+                    >
+                      ← Back
+                    </button>
+                    <button
+                      className="icon-btn"
+                      onClick={placeOrderMock}
+                      aria-label="Place order"
+                      title="Place order"
+                      style={{ width: 'auto', padding: '0 14px', background: 'var(--color-secondary)', color: 'var(--color-surface)', borderColor: 'transparent' }}
+                    >
+                      Place order
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {checkoutStage === 'success' && (
+                <div className="success-state">
+                  <div style={{ fontSize: 36 }}>✅</div>
+                  <div className="title" style={{ fontSize: 18, marginTop: 8 }}>Order Confirmed</div>
+                  <div className="card-meta">Your delicious food is on its way!</div>
+                  <button
+                    className="icon-btn"
+                    style={{ width: 'auto', padding: '0 14px', marginTop: 12, background: 'var(--color-primary)', color: 'var(--color-surface)', borderColor: 'transparent' }}
+                    onClick={() => setCartOpen(false)}
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="footer">

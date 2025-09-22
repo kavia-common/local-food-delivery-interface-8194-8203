@@ -17,6 +17,17 @@
 
   --nav-height: 64px;
   --sidebar-width: 280px;
+
+  /* Spacing scale for consistency */
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-12: 12px;
+  --space-14: 14px;
+  --space-16: 16px;
+  --space-18: 18px;
+  --space-20: 20px;
 }
 
 /* Minimal Reset + base */
@@ -43,12 +54,32 @@ body {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 var(--space-16);
 }
 
 .shadow-sm { box-shadow: var(--shadow-sm); }
 .shadow-md { box-shadow: var(--shadow-md); }
 .rounded { border-radius: var(--radius); }
+
+/* Simple helpers for consistent gaps */
+.spacer-8 { height: var(--space-8); }
+.spacer-16 { height: var(--space-16); }
+
+.inline-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.inline-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+}
+
+.range {
+  flex: 1;
+}
 
 /* Layout */
 .app-shell {
@@ -72,13 +103,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-12);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   font-weight: 700;
   letter-spacing: 0.2px;
 }
@@ -98,7 +129,7 @@ body {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .icon-btn {
@@ -122,25 +153,34 @@ body {
   background: #f9fafb;
 }
 
-/* Content area: sidebar + main */
+/* Content wrapper with breathing room */
 .app-content {
   display: grid;
-  grid-template-columns: var(--sidebar-width) 1fr;
-  gap: 20px;
-  padding: 20px 0;
+  gap: var(--space-20);
+  padding: var(--space-20) 0 var(--space-20);
 }
 
+/* Content grid adds left sidebar and right main with consistent column gap */
+.content-grid {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  gap: var(--space-20);
+  align-items: start;
+}
+
+/* Sidebar */
 .sidebar {
   background: var(--color-surface);
   border: 1px solid var(--border-color);
-  padding: 16px;
+  padding: var(--space-16);
   position: sticky;
-  top: calc(var(--nav-height) + 20px);
+  top: calc(var(--nav-height) + var(--space-20));
   height: fit-content;
+  border-radius: var(--radius);
 }
 
 .sidebar h3 {
-  margin: 0 0 8px 0;
+  margin: 0 0 var(--space-8) 0;
   font-size: 14px;
   color: var(--color-muted);
   font-weight: 600;
@@ -148,21 +188,21 @@ body {
 
 .filter-group {
   display: grid;
-  gap: 8px;
-  margin-top: 8px;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
 }
 
 /* Compact chip variant for badges */
 .filter-chip.badge {
-  padding: 4px 8px;
+  padding: var(--space-4) var(--space-8);
   border-radius: 999px;
 }
 
 .filter-chip {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-12);
   border: 1px solid var(--border-color);
   border-radius: 999px;
   background: #fafafa;
@@ -180,16 +220,18 @@ body {
 /* Main content area */
 .main {
   display: grid;
-  gap: 16px;
+  gap: var(--space-16);
 }
 
 /* Hero Cover */
 .hero-cover {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
-  gap: 18px;
+  gap: var(--space-18);
   background: var(--color-surface);
   border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: var(--space-16);
   overflow: hidden;
 }
 
@@ -223,8 +265,8 @@ body {
 .hero-content {
   display: grid;
   align-content: center;
-  gap: 8px;
-  padding: 12px 6px;
+  gap: var(--space-8);
+  padding: var(--space-6) var(--space-6);
 }
 
 .hero-eyebrow {
@@ -250,17 +292,17 @@ body {
 .hero-features {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px 14px;
+  gap: var(--space-8) var(--space-14);
   list-style: none;
-  margin: 6px 0 0 0;
+  margin: var(--space-6) 0 0 0;
   padding: 0;
 }
 
 .hero-features li {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-10);
   border: 1px dashed rgba(37,99,235,0.35);
   border-radius: 10px;
   background: #f5f7fb;
@@ -272,6 +314,7 @@ body {
 @media (max-width: 960px) {
   .hero-cover {
     grid-template-columns: 1fr;
+    height: auto;
   }
   .hero-media {
     height: 200px;
@@ -281,6 +324,7 @@ body {
   }
 }
 
+/* tighten spacing for small phones */
 @media (max-width: 520px) {
   .hero-media {
     height: 180px;
@@ -295,13 +339,15 @@ body {
 
 .section-header {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
+  gap: var(--space-12);
 }
 
 .title {
   font-size: 20px;
   font-weight: 700;
+  margin: 0 0 var(--space-4) 0;
 }
 
 .subtitle {
@@ -313,7 +359,7 @@ body {
 .card-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  gap: 16px;
+  gap: var(--space-16);
 }
 
 .card {
@@ -321,9 +367,9 @@ body {
   background: var(--color-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
-  padding: 14px;
+  padding: var(--space-14);
   display: grid;
-  gap: 8px;
+  gap: var(--space-8);
   transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
 }
 
@@ -359,7 +405,7 @@ body {
   border-left: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  padding: 12px;
+  padding: var(--space-12);
   animation: slideIn 200ms ease;
 }
 
@@ -372,7 +418,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 8px;
+  padding-bottom: var(--space-8);
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -380,8 +426,8 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 8px 2px;
+  gap: var(--space-10);
+  padding: var(--space-8) var(--space-2);
   overflow: auto;
 }
 
@@ -390,7 +436,7 @@ body {
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .cart-item {
@@ -399,13 +445,13 @@ body {
   justify-content: space-between;
   border: 1px solid var(--border-color);
   border-radius: 10px;
-  padding: 8px;
+  padding: var(--space-8);
   background: #fafafa;
 }
 
 .cart-item-info {
   display: grid;
-  gap: 2px;
+  gap: var(--space-4);
 }
 
 .cart-item-name {
@@ -415,7 +461,7 @@ body {
 .cart-item-actions {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
 }
 
 .qty-input {
@@ -423,7 +469,7 @@ body {
   height: 32px;
   border-radius: 8px;
   border: 1px solid var(--border-color);
-  padding: 0 8px;
+  padding: 0 var(--space-8);
 }
 
 .qty-badge {
@@ -432,7 +478,7 @@ body {
   justify-content: center;
   min-width: 28px;
   height: 28px;
-  padding: 0 8px;
+  padding: 0 var(--space-8);
   border-radius: 999px;
   border: 1px solid var(--border-color);
   background: #f5f7fb;
@@ -443,9 +489,9 @@ body {
 .cart-footer {
   margin-top: auto;
   border-top: 1px solid var(--border-color);
-  padding-top: 10px;
+  padding-top: var(--space-10);
   display: grid;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .cart-summary {
@@ -458,34 +504,34 @@ body {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .checkout-form .form-field {
   display: grid;
-  gap: 6px;
-  margin-bottom: 10px;
+  gap: var(--space-6);
+  margin-bottom: var(--space-10);
 }
 
 .checkout-form input,
 .checkout-form textarea {
   border: 1px solid var(--border-color);
   border-radius: 10px;
-  padding: 8px 10px;
+  padding: var(--space-8) var(--space-10);
   font-size: 14px;
 }
 
 .review .review-block {
   border: 1px solid var(--border-color);
   border-radius: 10px;
-  padding: 10px;
+  padding: var(--space-10);
   background: #fafafa;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-10);
 }
 
 .review .review-title {
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: var(--space-6);
 }
 
 .success-state {
@@ -509,7 +555,7 @@ body {
   justify-content: space-between;
 }
 
-/* Responsive */
+/* Responsive cards */
 @media (min-width: 640px) {
   .card { grid-column: span 6; }
 }
@@ -518,8 +564,9 @@ body {
   .card { grid-column: span 4; }
 }
 
+/* Responsive behavior for content grid and sidebar */
 @media (max-width: 960px) {
-  .app-content {
+  .content-grid {
     grid-template-columns: 1fr;
   }
   .sidebar {

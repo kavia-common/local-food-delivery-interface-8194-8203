@@ -423,172 +423,175 @@ function App() {
           </div>
         </section>
 
-        {/* Sidebar */}
-        <aside className="sidebar rounded shadow-sm">
-          <h3>Filter by cuisine</h3>
-          {/* PUBLIC_INTERFACE */}
-          {/* Cuisine filters: simple checkbox list with clear UI feedback (checked state + chip) */}
-          <div className="filter-group" role="group" aria-label="Cuisine filters">
-            {cuisineOptions.map((c) => {
-              const checked = selectedCuisineKeys.includes(c.key);
-              return (
-                <label
-                  key={c.key}
-                  className="filter-chip"
-                  style={{
-                    borderColor: checked ? 'rgba(37,99,235,0.55)' : undefined,
-                    background: checked ? '#f0f5ff' : undefined,
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => handleCuisineToggle(c.key)}
-                    aria-label={`Filter by ${c.label.replace(/^[^ ]+ /, '')}`}
-                    style={{ marginRight: 8 }}
-                  />
-                  <span>{c.label}</span>
-                </label>
-              );
-            })}
+        {/* Sidebar + Main grid wrapper for balanced spacing */}
+        <section className="content-grid">
+          {/* Sidebar */}
+          <aside className="sidebar rounded shadow-sm">
+            <h3>Filter by cuisine</h3>
             {/* PUBLIC_INTERFACE */}
-            <button
-              className="icon-btn"
-              aria-label="Clear cuisine filters"
-              title="Clear filters"
-              onClick={() => setSelectedCuisineKeys([])}
-              style={{ width: '100%', height: 38, borderStyle: 'dashed' }}
-            >
-              Clear
-            </button>
-          </div>
-
-          {/* NEW: Rating filter */}
-          <div style={{ height: 16 }} />
-          <h3>Minimum rating</h3>
-          <div className="filter-group" role="group" aria-label="Minimum rating">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <input
-                type="range"
-                min="0"
-                max="5"
-                step="0.5"
-                value={minRating}
-                onChange={(e) => setMinRating(parseFloat(e.target.value))}
-                aria-label="Minimum average rating"
-                style={{ flex: 1 }}
-              />
-              <div
-                className="filter-chip"
-                style={{ padding: '6px 10px', cursor: 'default' }}
-                aria-live="polite"
-              >
-                ⭐ {minRating.toFixed(1)}+
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {[0, 3, 4, 4.5].map((preset) => {
-                const active = minRating === preset;
+            {/* Cuisine filters: simple checkbox list with clear UI feedback (checked state + chip) */}
+            <div className="filter-group" role="group" aria-label="Cuisine filters">
+              {cuisineOptions.map((c) => {
+                const checked = selectedCuisineKeys.includes(c.key);
                 return (
-                  <button
-                    key={preset}
-                    className="icon-btn"
-                    onClick={() => setMinRating(preset)}
-                    aria-label={`Set minimum rating to ${preset}`}
-                    title={`Min ${preset}+`}
+                  <label
+                    key={c.key}
+                    className="filter-chip"
                     style={{
-                      width: 'auto',
-                      padding: '0 10px',
-                      borderColor: active ? 'rgba(37,99,235,0.55)' : 'var(--border-color)',
-                      background: active ? '#f0f5ff' : 'var(--color-surface)'
+                      borderColor: checked ? 'rgba(37,99,235,0.55)' : undefined,
+                      background: checked ? '#f0f5ff' : undefined,
                     }}
                   >
-                    ⭐ {preset}+
-                  </button>
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => handleCuisineToggle(c.key)}
+                      aria-label={`Filter by ${c.label.replace(/^[^ ]+ /, '')}`}
+                      style={{ marginRight: 8 }}
+                    />
+                    <span>{c.label}</span>
+                  </label>
                 );
               })}
+              {/* PUBLIC_INTERFACE */}
+              <button
+                className="icon-btn"
+                aria-label="Clear cuisine filters"
+                title="Clear filters"
+                onClick={() => setSelectedCuisineKeys([])}
+                style={{ width: '100%', height: 38, borderStyle: 'dashed' }}
+              >
+                Clear
+              </button>
             </div>
-          </div>
 
-          {/* NEW: Offers toggle */}
-          <div style={{ height: 16 }} />
-          <h3>Offers</h3>
-          <div className="filter-group" role="group" aria-label="Offers">
-            <label
-              className="filter-chip"
-              style={{
-                borderColor: onlyOffers ? 'rgba(37,99,235,0.55)' : undefined,
-                background: onlyOffers ? '#f0f5ff' : undefined,
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={onlyOffers}
-                onChange={() => setOnlyOffers((v) => !v)}
-                aria-label="Show only restaurants with offers"
-                style={{ marginRight: 8 }}
-              />
-              <span>Only with current offers</span>
-            </label>
-          </div>
-        </aside>
-
-        {/* Main Area */}
-        <section className="main">
-          <div className="section-header">
-            <div>
-              <div className="title">Nearby Restaurants</div>
-              <div className="subtitle" aria-live="polite">
-                {(() => {
-                  const parts = [];
-                  if (selectedCuisineKeys.length > 0) parts.push(`${selectedCuisineKeys.length} cuisine${selectedCuisineKeys.length > 1 ? 's' : ''}`);
-                  if (minRating > 0) parts.push(`⭐ ${minRating.toFixed(1)}+`);
-                  if (onlyOffers) parts.push('with offers');
-                  const filterSummary = parts.length > 0 ? `Filtered by ${parts.join(' • ')}` : 'Showing all';
-                  return `${filterSummary} • ${filteredRestaurants.length} result${filteredRestaurants.length === 1 ? '' : 's'}`;
-                })()}
+            {/* NEW: Rating filter */}
+            <div className="spacer-16" />
+            <h3>Minimum rating</h3>
+            <div className="filter-group" role="group" aria-label="Minimum rating">
+              <div className="inline-row">
+                <input
+                  type="range"
+                  min="0"
+                  max="5"
+                  step="0.5"
+                  value={minRating}
+                  onChange={(e) => setMinRating(parseFloat(e.target.value))}
+                  aria-label="Minimum average rating"
+                  className="range"
+                />
+                <div
+                  className="filter-chip"
+                  style={{ padding: '6px 10px', cursor: 'default' }}
+                  aria-live="polite"
+                >
+                  ⭐ {minRating.toFixed(1)}+
+                </div>
+              </div>
+              <div className="inline-wrap">
+                {[0, 3, 4, 4.5].map((preset) => {
+                  const active = minRating === preset;
+                  return (
+                    <button
+                      key={preset}
+                      className="icon-btn"
+                      onClick={() => setMinRating(preset)}
+                      aria-label={`Set minimum rating to ${preset}`}
+                      title={`Min ${preset}+`}
+                      style={{
+                        width: 'auto',
+                        padding: '0 10px',
+                        borderColor: active ? 'rgba(37,99,235,0.55)' : 'var(--border-color)',
+                        background: active ? '#f0f5ff' : 'var(--color-surface)'
+                      }}
+                    >
+                      ⭐ {preset}+
+                    </button>
+                  );
+                })}
               </div>
             </div>
-            <button
-              className="icon-btn"
-              aria-label="Sort options"
-              title="Sort"
-              style={{ color: 'var(--color-primary)' }}
-            >
-              ⤓
-            </button>
-          </div>
 
-          <div className="card-grid">
-            {filteredRestaurants.length === 0 ? (
-              <article className="card" role="status">
-                <div className="card-title">No matches</div>
-                <div className="card-meta">Try adjusting your filters (cuisine, rating, or offers).</div>
-              </article>
-            ) : (
-              filteredRestaurants.map((r) => (
-                <article key={r.id} className="card">
-                  <div className="card-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                    <span>{r.name}</span>
-                    <RatingBadge rating={r.rating ?? 0} />
-                  </div>
-                  <div className="card-meta">
-                    {r.meta} {r.hasOffer ? `• 🔖 ${r.offerText ?? 'Offer available'}` : ''}
-                  </div>
-                  <div style={{ height: 8 }}></div>
-                  <button
-                    className="icon-btn"
-                    aria-label={`Add ${r.name} to cart`}
-                    title="Add to cart"
-                    onClick={() => addToCart(r)}
-                    style={buttonStyleFor(r.accent)}
-                  >
-                    Add
-                  </button>
+            {/* NEW: Offers toggle */}
+            <div className="spacer-16" />
+            <h3>Offers</h3>
+            <div className="filter-group" role="group" aria-label="Offers">
+              <label
+                className="filter-chip"
+                style={{
+                  borderColor: onlyOffers ? 'rgba(37,99,235,0.55)' : undefined,
+                  background: onlyOffers ? '#f0f5ff' : undefined,
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={onlyOffers}
+                  onChange={() => setOnlyOffers((v) => !v)}
+                  aria-label="Show only restaurants with offers"
+                  style={{ marginRight: 8 }}
+                />
+                <span>Only with current offers</span>
+              </label>
+            </div>
+          </aside>
+
+          {/* Main Area */}
+          <section className="main">
+            <div className="section-header">
+              <div>
+                <div className="title">Nearby Restaurants</div>
+                <div className="subtitle" aria-live="polite">
+                  {(() => {
+                    const parts = [];
+                    if (selectedCuisineKeys.length > 0) parts.push(`${selectedCuisineKeys.length} cuisine${selectedCuisineKeys.length > 1 ? 's' : ''}`);
+                    if (minRating > 0) parts.push(`⭐ ${minRating.toFixed(1)}+`);
+                    if (onlyOffers) parts.push('with offers');
+                    const filterSummary = parts.length > 0 ? `Filtered by ${parts.join(' • ')}` : 'Showing all';
+                    return `${filterSummary} • ${filteredRestaurants.length} result${filteredRestaurants.length === 1 ? '' : 's'}`;
+                  })()}
+                </div>
+              </div>
+              <button
+                className="icon-btn"
+                aria-label="Sort options"
+                title="Sort"
+                style={{ color: 'var(--color-primary)' }}
+              >
+                ⤓
+              </button>
+            </div>
+
+            <div className="card-grid">
+              {filteredRestaurants.length === 0 ? (
+                <article className="card" role="status">
+                  <div className="card-title">No matches</div>
+                  <div className="card-meta">Try adjusting your filters (cuisine, rating, or offers).</div>
                 </article>
-              ))
-            )}
-          </div>
+              ) : (
+                filteredRestaurants.map((r) => (
+                  <article key={r.id} className="card">
+                    <div className="card-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                      <span>{r.name}</span>
+                      <RatingBadge rating={r.rating ?? 0} />
+                    </div>
+                    <div className="card-meta">
+                      {r.meta} {r.hasOffer ? `• 🔖 ${r.offerText ?? 'Offer available'}` : ''}
+                    </div>
+                    <div className="spacer-8" />
+                    <button
+                      className="icon-btn"
+                      aria-label={`Add ${r.name} to cart`}
+                      title="Add to cart"
+                      onClick={() => addToCart(r)}
+                      style={buttonStyleFor(r.accent)}
+                    >
+                      Add
+                    </button>
+                  </article>
+                ))
+              )}
+            </div>
+          </section>
         </section>
       </main>
 
